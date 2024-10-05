@@ -20,13 +20,12 @@ var db *gorm.DB
 func init() {
 	var err error
 	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info), // Включение отладочного режима
+		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
 		log.Fatal("Не удалось подключиться к базе данных:", err)
 	}
 
-	// Обработка ошибок при миграции
 	if err := db.AutoMigrate(&Person{}); err != nil {
 		log.Fatal("Не удалось выполнить миграцию:", err)
 	}
@@ -85,3 +84,5 @@ func deletePerson(c *gin.Context) {
 	db.Delete(&person)
 	c.JSON(http.StatusOK, gin.H{"message": "Человек удален"})
 }
+
+//

@@ -23,7 +23,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error during auto migration: %v", err)
 	}
-
 	db.Create(&User{Name: "Dastan", Age: 21})
 	db.Create(&User{Name: "Erlan", Age: 23})
 	db.Create(&User{Name: "Aspandiyar", Age: 20})

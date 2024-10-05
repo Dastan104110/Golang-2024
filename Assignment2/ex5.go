@@ -10,25 +10,23 @@ type User struct {
 	ID      uint `gorm:"primaryKey"`
 	Name    string
 	Age     int
-	Profile Profile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:UserID"` // Явное указание внешнего ключа
+	Profile Profile `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:UserID"`
 }
 
 type Profile struct {
 	ID                uint `gorm:"primaryKey"`
-	UserID            uint `gorm:"index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // Внешний ключ для пользователя
+	UserID            uint `gorm:"index;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	Bio               string
 	ProfilePictureURL string
 }
 
 func main() {
-	// Подключение к базе данных
 	dsn := "host=localhost user=dastan password=123104110115118 dbname=goproject port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
 	}
 
-	// Настройка пула соединений
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Failed to get the generic database object:", err)
@@ -37,33 +35,27 @@ func main() {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(0)
 
-	// Авто-миграция для создания таблиц с ассоциациями
-	err = db.AutoMigrate(&User{}) // Сначала мигрируем таблицу User
+	err = db.AutoMigrate(&User{})
 	if err != nil {
 		log.Fatal("Failed to migrate User table:", err)
 	}
 
-	err = db.AutoMigrate(&Profile{}) // Затем мигрируем таблицу Profile
+	err = db.AutoMigrate(&Profile{})
 	if err != nil {
 		log.Fatal("Failed to migrate Profile table:", err)
 	}
 
-	// Вставка двух пользователей с профилями
 	createUsersWithProfiles(db)
 
-	// Запрос данных с ассоциациями (до удаления)
 	log.Println("Users and profiles before deletion:")
 	getUsersWithProfiles(db)
 
-	// Удаление одного пользователя
 	deleteUserWithProfile(db, 1)
 
-	// Запрос данных с ассоциациями (после удаления)
 	log.Println("Users and profiles after deletion:")
 	getUsersWithProfiles(db)
 }
 
-// Функция для создания двух пользователей с их профилями
 func createUsersWithProfiles(db *gorm.DB) {
 	err := db.Transaction(func(tx *gorm.DB) error {
 		users := []User{
@@ -97,7 +89,6 @@ func createUsersWithProfiles(db *gorm.DB) {
 	}
 }
 
-// Функция для запроса пользователей вместе с их профилями (жадная загрузка)
 func getUsersWithProfiles(db *gorm.DB) {
 	var users []User
 	db.Preload("Profile").Find(&users)
@@ -107,7 +98,6 @@ func getUsersWithProfiles(db *gorm.DB) {
 	}
 }
 
-// Функция для обновления профиля пользователя (можно использовать для тестирования)
 func updateProfile(db *gorm.DB, userID uint, newBio string) {
 	var profile Profile
 	db.First(&profile, "user_id = ?", userID)
@@ -116,8 +106,9 @@ func updateProfile(db *gorm.DB, userID uint, newBio string) {
 	log.Printf("Profile updated for user ID %d\n", userID)
 }
 
-// Функция для удаления пользователя вместе с профилем
 func deleteUserWithProfile(db *gorm.DB, userID uint) {
 	db.Delete(&User{}, userID)
 	log.Printf("User with ID %d and associated profile deleted\n", userID)
 }
+
+//

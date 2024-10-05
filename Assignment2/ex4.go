@@ -22,32 +22,23 @@ func main() {
 	}
 	defer db.Close()
 
-	// Создание таблицы
 	CreateTable(db)
 
-	// Вставка пользователей
 	insertUsers(db)
 
-	// Запрос пользователей без фильтрации и с пагинацией
-	queryUsers(db, 0, 1, 10) // Все пользователи, 1 страница, 10 пользователей на странице
+	queryUsers(db, 0, 1, 10)
 
-	// Обновление пользователя
 	updateUser(db, 1, "Dastan Updated", 22)
 
-	// Запрос пользователей после обновления
-	queryUsers(db, 0, 1, 10) // Все пользователи, 1 страница, 10 пользователей на странице
+	queryUsers(db, 0, 1, 10)
 
-	// Удаление пользователя
 	deleteUser(db, 2)
 
-	// Запрос пользователей после удаления
-	queryUsers(db, 0, 1, 10) // Все пользователи, 1 страница, 10 пользователей на странице
+	queryUsers(db, 0, 1, 10)
 
-	// Запрос пользователей с фильтрацией по возрасту
-	queryUsers(db, 21, 1, 10) // Фильтр по возрасту, 1 страница, 10 пользователей на странице
+	queryUsers(db, 21, 1, 10)
 }
 
-// Функция создания таблицы
 func CreateTable(db *sql.DB) {
 	query := `
 	CREATE TABLE IF NOT EXISTS users (
@@ -63,7 +54,6 @@ func CreateTable(db *sql.DB) {
 	}
 }
 
-// Функция вставки пользователей
 func insertUsers(db *sql.DB) {
 	users := []User{
 		{Name: "Dastan", Age: 21},
@@ -80,7 +70,6 @@ func insertUsers(db *sql.DB) {
 	fmt.Println("Пользователи успешно вставлены.")
 }
 
-// Функция запроса пользователей с фильтрацией и пагинацией
 func queryUsers(db *sql.DB, ageFilter int, page int, pageSize int) {
 	var query string
 	var args []interface{}
@@ -108,7 +97,6 @@ func queryUsers(db *sql.DB, ageFilter int, page int, pageSize int) {
 	}
 }
 
-// Функция обновления пользователя
 func updateUser(db *sql.DB, id int, name string, age int) {
 	_, err := db.Exec("UPDATE users SET name = $1, age = $2 WHERE id = $3", name, age, id)
 	if err != nil {
@@ -117,7 +105,6 @@ func updateUser(db *sql.DB, id int, name string, age int) {
 	fmt.Println("Пользователь успешно обновлен.")
 }
 
-// Функция удаления пользователя
 func deleteUser(db *sql.DB, id int) {
 	_, err := db.Exec("DELETE FROM users WHERE id = $1", id)
 	if err != nil {
@@ -125,3 +112,5 @@ func deleteUser(db *sql.DB, id int) {
 	}
 	fmt.Println("Пользователь успешно удален.")
 }
+
+//
